@@ -1,0 +1,61 @@
+{
+  "collections": [
+    {
+      "name": "users",
+      "path": "users",
+      "description": "Stores user profiles including students, merchants, and parents.",
+      "securityRules": {
+        "read": "request.auth != null",
+        "create": "request.auth != null && request.auth.uid == documentId",
+        "update": "request.auth != null && (request.auth.uid == documentId || request.auth.uid in resource.data.parentIds)",
+        "delete": "false"
+      },
+      "schema": {
+        "type": "object",
+        "properties": {
+          "uid": { "type": "string", "description": "Firebase Auth UID" },
+          "role": { "type": "string", "description": "User role: STUDENT, MERCHANT, or PARENT" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "avatar": { "type": "string" },
+          "balance": { "type": "number", "description": "Wallet balance" },
+          "studentId": { "type": "string", "description": "Student ID (for students)" },
+          "businessName": { "type": "string", "description": "Business Name (for merchants)" },
+          "parentIds": { "type": "array", "items": { "type": "string" }, "description": "UIDs of parents linked to this student" },
+          "linkedWards": { "type": "array", "items": { "type": "string" }, "description": "UIDs of students linked to this parent" },
+          "cardFrozen": { "type": "boolean", "description": "Security flag for students" },
+          "dailyLimit": { "type": "number", "description": "Daily spending limit" },
+          "categoryCaps": { "type": "object", "description": "Spending limits per category" }
+        },
+        "required": ["uid", "role", "name", "email", "balance"]
+      }
+    },
+    {
+      "name": "transactions",
+      "path": "transactions",
+      "description": "Stores all financial transactions.",
+      "securityRules": {
+        "read": "request.auth != null",
+        "create": "request.auth != null",
+        "update": "false",
+        "delete": "false"
+      },
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "userId": { "type": "string", "description": "UID of the user this transaction belongs to" },
+          "merchantId": { "type": "string", "description": "UID of the merchant (if applicable)" },
+          "amount": { "type": "number" },
+          "type": { "type": "string", "description": "credit or debit" },
+          "category": { "type": "string" },
+          "merchant": { "type": "string", "description": "Name of the merchant or sender" },
+          "time": { "type": "string" },
+          "date": { "type": "string" },
+          "timestamp": { "type": "number" }
+        },
+        "required": ["id", "userId", "amount", "type", "timestamp"]
+      }
+    }
+  ]
+}
